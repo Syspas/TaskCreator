@@ -9,10 +9,24 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
+/**
+ * Конфигурация безопасности для приложения TaskCreator.
+ * <p>
+ * Этот класс настраивает безопасность веб-приложения, включая аутентификацию и авторизацию пользователей.
+ * Основной механизм аутентификации основан на памяти. Также определены правила доступа к ресурсам.
+ * </p>
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
+    /**
+     * Настраивает фильтр безопасности для HTTP.
+     *
+     * @param http объект HttpSecurity для настройки безопасности.
+     * @return настроенный объект SecurityFilterChain.
+     * @throws Exception в случае ошибки конфигурации.
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -33,20 +47,25 @@ public class SecurityConfig {
         return http.build();
     }
 
-
+    /**
+     * Создает экземпляр UserDetailsService для хранения пользователей в памяти.
+     *
+     * @return UserDetailsService с заранее определенными пользователями и их ролями.
+     * @throws Exception в случае ошибки конфигурации.
+     */
     @Bean
     public UserDetailsService userDetailsService() throws Exception {
         InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
-        // Create users with username, password, and roles
+        // Создание пользователей с именем, паролем и ролями
         manager.createUser(User.withDefaultPasswordEncoder()
                 .username("user")
                 .password("password")
-                .roles("USER") // User role
+                .roles("USER") // Роль пользователя
                 .build());
         manager.createUser(User.withDefaultPasswordEncoder()
                 .username("admin")
                 .password("admin")
-                .roles("ADMIN") // Admin role
+                .roles("ADMIN") // Роль администратора
                 .build());
         return manager;
     }
