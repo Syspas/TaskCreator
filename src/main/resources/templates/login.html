@@ -1,23 +1,80 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Вход</title>
+    <title>Авторизация</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 350px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            box-sizing: border-box;
+        }
+
+        button[type="submit"] {
+            background-color: #007bff; /* Синий цвет */
+            color: #fff;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3; /* Темнее синий цвет */
+        }
+
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
-<h2>Форма входа</h2>
-<form action="/login" method="post">
-    <div>
-        <label for="username">Имя пользователя:</label>
-        <input type="text" name="username" id="username" required>
-    </div>
-    <div>
+<div class="container">
+    <h1>Авторизация</h1>
+    <form method="POST" th:action="@{/login}">
+        <label for="username">Логин:</label>
+        <input type="text" id="username" name="username" required><br><br>
         <label for="password">Пароль:</label>
-        <input type="password" name="password" id="password" required>
-    </div>
-    <div>
+        <input type="password" id="password" name="password" required><br><br>
         <button type="submit">Войти</button>
-    </div>
-</form>
+        <p th:if="${error}" th:text="${error}" class="error"></p>
+    </form>
+
+</div>
 </body>
 </html>
+
+
