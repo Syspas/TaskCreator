@@ -8,25 +8,13 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
-/**
- * Конфигурация безопасности для приложения TaskCreator.
- * <p>
- * Этот класс настраивает безопасность веб-приложения, включая аутентификацию и авторизацию пользователей.
- * Основной механизм аутентификации основан на памяти. Также определены правила доступа к ресурсам.
- * </p>
- */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    /**
-     * Настраивает фильтр безопасности для HTTP.
-     *
-     * @param http объект HttpSecurity для настройки безопасности.
-     * @return настроенный объект SecurityFilterChain.
-     * @throws Exception в случае ошибки конфигурации.
-     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -34,39 +22,44 @@ public class SecurityConfig {
                         .requestMatchers("/", "/login", "/static/**").permitAll() // Разрешение доступа без аутентификации
                         .anyRequest().authenticated() // Требуется аутентификация для всех остальных запросов
                 )
+
                 .formLogin(formLogin -> formLogin
                         .loginPage("/login") // Страница логина
+                        .defaultSuccessUrl("/home") // Перенаправление на домашнюю страницу после успешного входа
                         .permitAll()
                 )
                 .logout(logout -> logout
-                        .logoutSuccessUrl("/") // Страница после выхода
+                        .logoutUrl("/logout") // URL выхода
+                        .logoutSuccessUrl("/logout-success") // Страница после выхода
                         .permitAll()
                 )
+
+
+
                 .csrf(csrf -> csrf.disable()); // Временное отключение для разработки; включите в производстве!
 
         return http.build();
     }
 
-    /**
-     * Создает экземпляр UserDetailsService для хранения пользователей в памяти.
-     *
-     * @return UserDetailsService с заранее определенными пользователями и их ролями.
-     * @throws Exception в случае ошибки конфигурации.
-     */
     @Bean
     public UserDetailsService userDetailsService() throws Exception {
         InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
+        PasswordEncoder passwordEncoder = passwordEncoder();
+
         // Создание пользователей с именем, паролем и ролями
-        manager.createUser(User.withDefaultPasswordEncoder()
-                .username("user")
-                .password("password")
+        manager.createUser(User.withUsername("user")
+                .password(passwordEncoder.encode("password"))
                 .roles("USER") // Роль пользователя
                 .build());
-        manager.createUser(User.withDefaultPasswordEncoder()
-                .username("admin")
-                .password("admin")
+        manager.createUser(User.withUsername("admin")
+                .password(passwordEncoder.encode("admin"))
                 .roles("ADMIN") // Роль администратора
                 .build());
         return manager;
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(); // Рекомендуемый шифратор паролей
     }
 }
